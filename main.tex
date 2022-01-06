@@ -1,17 +1,51 @@
-Sub cnpj()
+Sub stoptemp()
 
 Dim cnpjin As String
 
+Dim Choose As String
+
+
 cnpjin = InputBox("Favor informar CNPJ atual: ")
 
+
+
+Choose = InputBox("1-Processado 2-Não processado")
+Dim wkbk As Workbook
+Set wkbk = Workbooks.Open("C:\Users\T780000\Desktop\Work\Cartão_obs.xlsx")
+
+
+Select Case Choose
+Case 1:
+wkbk.Sheets("produtos").Select
 Dim find1 As Range
 Set find1 = Sheets("produtos").Range("A:A").Find(what:=cnpjin, lookat:=xlWhole)
 If Not find1 Is Nothing Then
 find1.Select
-Sheets("produtos").Range("A1:A" & ActiveCell.Row - 1).EntireRow.Delete
+Sheets("produtos").Range("A1:A" & ActiveCell.Row).EntireRow.Delete
 Sheets("base").Select
 Dim find2 As Range
 Set find2 = Sheets("base").Range("A:A").Find(what:=cnpjin, lookat:=xlWhole)
+find2.Select
+Sheets("base").Select
+Sheets("base").Range("G1:G" & ActiveCell.Row).Formula = "=now()"
+Sheets("base").Range("G1:G" & ActiveCell.Row).Copy
+Sheets("base").Range("G1:G" & ActiveCell.Row).PasteSpecial Paste:=xlPasteValues
+Else
+MsgBox "Não encontrado"
+End If
+
+
+
+Case 2:
+wkbk.Sheets("produtos").Select
+Dim find3 As Range
+Set find3 = Sheets("produtos").Range("A:A").Find(what:=cnpjin, lookat:=xlWhole)
+If Not find1 Is Nothing Then
+find1.Select
+Sheets("produtos").Range("A1:A" & ActiveCell.Row - 1).EntireRow.Delete
+Sheets("base").Select
+Dim find4 As Range
+Set find4 = Sheets("base").Range("A:A").Find(what:=cnpjin, lookat:=xlWhole)
 find2.Select
 Sheets("base").Select
 
@@ -19,15 +53,15 @@ Sheets("base").Range("G1:G" & ActiveCell.Row - 1).Formula = "=now()"
 Sheets("base").Range("G1:G" & ActiveCell.Row - 1).Copy
 Sheets("base").Range("G1:G" & ActiveCell.Row - 1).PasteSpecial Paste:=xlPasteValues
 
-
-
-
 Else
-MsgBox "Não encontrei o cnpj informado"
+MsgBox "Não encontrado"
 End If
 
+End Select
 
 End Sub
+
+
 
 
 
