@@ -1,28 +1,107 @@
- For i = 2 To Sheet.Range("D100000").End(xlUp).Row
-If Sheet1.Cells(i, 1) = Me.ComboBox1 Then
-myr = myr + 1
-For Colum = 1 To 4
-database(myr, Colum) = Sheet1.Cells(i, Colum)
 
-Next Colum
+
+
+Private Sub ComboBox1_Change()
+    Dim a()
+Dim i&
+Dim sh As Worksheet
+Set sh = ThisWorkbook.Sheets("Email")
+
+
+
+Sheets("Email").Select
+ListBox1.Clear
+
+Selection.AutoFilter
+Selection.AutoFilter Field:=4, Criteria1:=ComboBox1.Value
+'sh.AutoFilterMode = False
+Dim LR As Long
+
+
+
+Me.lbl_Count.Caption = Application.WorksheetFunction.Subtotal(2, Range("a2:a" & Rows(Rows.Count).End(xlUp).Row)) & " propostas encontradas"
+
+ 
+
+
+
+a = Sheets("Email").UsedRange.Value
+With Me.ListBox1
+.ColumnCount = 6
+    .ColumnHeads = True
+'.RowSource = "Cartão!A2:A" & LR
+For i = 2 To UBound(a)
+If a(i, 4) = ComboBox1 Then
+.ColumnHeads = True
+.AddItem
+'.List(.ListCount - 1, 0) = i
+.List(.ListCount - 1, 0) = a(i, 1)
+.List(.ListCount - 1, 1) = a(i, 2)
+.List(.ListCount - 1, 2) = a(i, 3)
+.List(.ListCount - 1, 3) = a(i, 4)
+
 End If
-Next i
-Me.ListBox1.List = database
+Next
 
 
+    '.ColumnCount = 7
+    
+
+
+End With
+
+
+
+
+
+
+End Sub
+
+
+
+
+
+Private Sub UserForm_Initialize()
+   ComboBox1.AddItem "APROVADA"
+    ComboBox1.AddItem "NEGADA"
+    ComboBox1.AddItem "FORM INCOMPLETO"
+    ComboBox1.AddItem "NAO CORRENTISTA"
+
+
+End Sub
+
+
+
+Private Sub CommandButton1_Click()
+Dim sh As Worksheet
+Set sh = ThisWorkbook.Sheets("Email")
+
+
+
+Dim last_row As Integer
+last_row = Application.CountA(sh.Range("A:A"))
 
 Dim OutlookApp As Object
     Dim OutlookMail As Object
     Set OutlookApp = CreateObject("Outlook.Application")
     Set OutlookMail = OutlookApp.CreateItem(0)
+    
+    
+If ComboBox1.ListIndex = 0 Then
+
+    
+    
+
     With OutlookMail
-        .to = EnviarPara
+        .to = sendTo
         .CC = ""
         .BCC = ""
         .Subject = "Retorno sobre solicitação de crédito"
-        .Body = Mensagem
+        .Body = "Olá, você foi recusado pelo motivo de:" & sh.Range("E" & i).Value
         .Display '
     End With
+    
+ 
     Set OutlookMail = Nothing
     Set OutlookApp = Nothing
 
@@ -34,117 +113,65 @@ Dim OutlookApp As Object
 
 
 
-Private Sub UserForm_Activate()
+
+
+ElseIf ComboBox1.ListIndex = 1 Then
+
+Set sh = Sheets("Email")
+
+Set OutApp = CreateObject("Outlook.Application")
+
+For Each cell In sh.Columns("G").Cells.SpecialCells(xlCellTypeConstants)
+
+    'Enter the path/file names in the D:Z column in each row
+    Set rng = sh.Cells(cell.Row, 1).Range("D1:Z1")
     
-    With Me.ComboBox1
-        .AddItem "All"
-        .AddItem "Name"
-        .AddItem "Mobile Number"
-        .AddItem "WhatsApp Number"
-        .AddItem "Email ID"
-        .AddItem "Address"
-        .AddItem "Comments"
-        .Value = "All"
-    End With
-    
-    Call Refresh_List_Box
-End Sub
+    If cell.Value Like "?*@?*.?*" And _
+    Application.WorksheetFunction.CountA(rng) > 0 Then
+        Set OutMail = OutApp.CreateItem(0)
+        
+        With OutMail
+            .to = sh.Cells(cell.Row, 7).Value
+            .CC = ""
+            .Subject = "Example Subject 1"
+            .Body = "oi"
+            
+         '   For Each FileCell In rng.SpecialCells(xlCellTypeConstants)
+           '     If Trim(FileCell.Value) <> "" Then
+              '      If Dir(FileCell.Value) <> "" Then
+               '         .Attachments.Add FileCell.Value
+                '    End If
+              '  End If
+           ' Next FileCell
+            
+            .Display
+            'Or use .Display/Send
+        End With
+        
+        Set OutMail = Nothing
+    End If
+Next cell
 
+Set OutApp = Nothing
 
-
-
-
-
-
-
-
-
-==
-
-
-'delete
-Private Sub CommandButton5_Click()
-
-If Me.ListBox1.ListIndex >= 0 Then
-    Dim sh As Worksheet
-    Set sh = ThisWorkbook.Sheets("AddressBook")
-    
-    Dim myRow As Long
-    myRow = Application.WorksheetFunction.Match(Me.ListBox1.List(Me.ListBox1.ListIndex, 0), sh.Range("A:A"), 0)
-    
-    sh.Range("A" & myRow).EntireRow.Delete
-    
-    Call Refresh_List_Box
-    
-    MsgBox "Record has been deleted", vbInformation
-    
-End If
-
-End Sub
-
-
-==
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-Sub Refresh_List_Box()
-
-Application.ScreenUpdating = False
-
-Dim sh As Worksheet
-Set sh = ThisWorkbook.Sheets("AddressBook")
-
-Dim dsh As Worksheet
-Set dsh = ThisWorkbook.Sheets("AddressBook_Display")
-
-
-sh.AutoFilterMode = False
-dsh.AutoFilterMode = False
-dsh.UsedRange.ClearContents
-
-''''' Copy data from Addressbook worksheet to Addressbook_Display worksheet
-  
-If Me.ComboBox1.Value <> "All" Then
-    Dim my_Column As Integer
-    my_Column = Application.WorksheetFunction.Match(Me.ComboBox1.Value, sh.Range("1:1"), 0)
-    sh.UsedRange.AutoFilter my_Column, "*" & Me.TextBox7.Value & "*"
-End If
-  
-sh.UsedRange.Copy dsh.Range("A1")
-sh.AutoFilterMode = False
-
-'''''''''' Display data in list box
-Dim LR As Long
-LR = Application.WorksheetFunction.CountA(dsh.Range("A:A"))
-
-If LR = 1 Then LR = 2
-
-With Me.ListBox1
-    .ColumnCount = 7
-    .ColumnHeads = True
-    .ColumnWidths = "0,100,100,100,110,150,170"
-    .RowSource = "AddressBook_Display!A2:G" & LR
+With Application
+    .EnableEvents = True
+    .ScreenUpdating = True
 End With
 
-Me.lbl_Count.Caption = Application.WorksheetFunction.CountA(dsh.Range("A:A")) - 1 & " Address"
+ElseIf ComboBox1.ListIndex = 2 Then
+MsgBox "oi3"
 
+
+
+ElseIf ComboBox1.ListIndex = 3 Then
+MsgBox "oi4"
+
+
+
+Else
+MsgBox "Nenhum item selecionado"
+End If
 
 End Sub
+
