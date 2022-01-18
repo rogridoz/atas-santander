@@ -1,5 +1,5 @@
 
-
+https://stackoverflow.com/questions/43948773/how-to-send-email-by-selecting-the-name-in-listbox
 
 Private Sub ComboBox1_Change()
     Dim a()
