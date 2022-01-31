@@ -1,73 +1,3 @@
-Sub stoptemp()
-
-Dim cnpjin As String
-
-Dim Choose As String
-
-
-cnpjin = InputBox("Favor informar CNPJ atual: ")
-
-
-
-Choose = InputBox("1-Processado 2-Não processado")
-Dim wkbk As Workbook
-Set wkbk = Workbooks.Open("C:\Users\T780000\Desktop\Work\Cartão_obs.xlsx")
-
-
-Select Case Choose
-Case 1:
-wkbk.Sheets("produtos").Select
-Dim find1 As Range
-Set find1 = Sheets("produtos").Range("A:A").Find(what:=cnpjin, lookat:=xlWhole)
-If Not find1 Is Nothing Then
-find1.Select
-Sheets("produtos").Range("A1:A" & ActiveCell.Row).EntireRow.Delete
-Sheets("base").Select
-Dim find2 As Range
-Set find2 = Sheets("base").Range("A:A").Find(what:=cnpjin, lookat:=xlWhole)
-find2.Select
-Sheets("base").Select
-Sheets("base").Range("G1:G" & ActiveCell.Row).Formula = "=now()"
-Sheets("base").Range("G1:G" & ActiveCell.Row).Copy
-Sheets("base").Range("G1:G" & ActiveCell.Row).PasteSpecial Paste:=xlPasteValues
-Else
-MsgBox "Não encontrado"
-End If
-
-
-
-Case 2:
-wkbk.Sheets("produtos").Select
-Dim find3 As Range
-Set find3 = Sheets("produtos").Range("A:A").Find(what:=cnpjin, lookat:=xlWhole)
-If Not find1 Is Nothing Then
-find1.Select
-Sheets("produtos").Range("A1:A" & ActiveCell.Row - 1).EntireRow.Delete
-Sheets("base").Select
-Dim find4 As Range
-Set find4 = Sheets("base").Range("A:A").Find(what:=cnpjin, lookat:=xlWhole)
-find2.Select
-Sheets("base").Select
-
-Sheets("base").Range("G1:G" & ActiveCell.Row - 1).Formula = "=now()"
-Sheets("base").Range("G1:G" & ActiveCell.Row - 1).Copy
-Sheets("base").Range("G1:G" & ActiveCell.Row - 1).PasteSpecial Paste:=xlPasteValues
-
-Else
-MsgBox "Não encontrado"
-End If
-
-End Select
-
-End Sub
-
-
-
-
-
-
-
-
 
 \documentclass[a4paper, 11pt]{article}
 \usepackage{comment} % enables the use of multi-line comments (\ifx \fi) 
@@ -111,21 +41,21 @@ Uthgård, Polacksbacken hus 73, 75237 Uppsala\\}
 \begin{document}
 \pagestyle{style1}
 
-\textbf{Data: 27/12/2021} % inserir data aqui
+\textbf{Data: 31/01/2021} % inserir data aqui
 
-\textbf{Local: 23} % Definir local da reunião 
+\textbf{Local: P23-R04} % Definir local da reunião 
 
 \textbf{Participantes:} 
 \begin{description}
-\item (PP) Yuri Monsuete - Analista Segmentos III
-\item (SP) Gustavo Firmino: Analista Gestão Comercial I
-\item (TP) Rodrigo dos Santos: Estagiário
+\item (PP) Vitória Marine
+\item (SP) Rodrigo dos Santos
+
 \end{description}
 
 \makebox[\linewidth]{\rule{\linewidth}{0.4pt}}\\
-\textbf{Pessoa responsável dá início à reunião pelas 10h, referente À produção de cartões PJ, com a seguinte ordem de trabalhos:} 
+\textbf{Pessoa responsável dá início à reunião pelas 10h, referente ao alinhamento sobre a fila de avaliação de propostas do Caminho do Empreendedor:} 
 \begin{enumerate}
-\item Acompanhamento mensal dos cartões PJ
+\item Análise de retorno relativo à descrição dos filtros combo
 
 
 \item Produção, distribuição e faturamento (dividido em crédito e débito)
