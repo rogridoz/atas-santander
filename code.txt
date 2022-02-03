@@ -1,177 +1,459 @@
+#cs ----------------------------------------------------------------------------
 
-https://stackoverflow.com/questions/43948773/how-to-send-email-by-selecting-the-name-in-listbox
+ AutoIt Version: 3.3.6.1
+ Author:         myName
 
-Private Sub ComboBox1_Change()
-    Dim a()
-Dim i&
-Dim sh As Worksheet
-Set sh = ThisWorkbook.Sheets("Email")
+ Script Function:
+	Template AutoIt script.
 
+#ce ----T004------------------------------------------------------------------------
 
+; Script Start - Add your code below here
+#include <Excel.au3>
 
-Sheets("Email").Select
-ListBox1.Clear
+Global $CNPJ[1400]
+Global $FAT[1400]
+Global $DEFESA[1400]
+Global $PARCELA[1400]
+GLOBAL $Hotkey
+Global $n = 0
+Global $i = 1
+HotKeySet("{F3}","Pause")
+HotKeySet("{F4}","Kill")
+$sFilePath1 = "C:\Users\T004Z203\Desktop\Cartão_obs.xlsx" ;This file should already exist
+$oExcel = _ExcelBookOpen($sFilePath1)
 
-Selection.AutoFilter
-Selection.AutoFilter Field:=4, Criteria1:=ComboBox1.Value
-'sh.AutoFilterMode = False
-Dim LR As Long
+#comments-start - DESCRIÇÃO DAS FUNÇÕES:
 
+INICIO - BUSCAR CNPJ
+PAUSE - PAUSAR ROBÔ
+KILL - ENCERRAR O ROBÔ
 
+#comments-end
 
-Me.lbl_Count.Caption = Application.WorksheetFunction.Subtotal(2, Range("a2:a" & Rows(Rows.Count).End(xlUp).Row)) & " propostas encontradas"
-
- 
-
-
-
-a = Sheets("Email").UsedRange.Value
-With Me.ListBox1
-.ColumnCount = 6
-    .ColumnHeads = True
-'.RowSource = "Cartão!A2:A" & LR
-For i = 2 To UBound(a)
-If a(i, 4) = ComboBox1 Then
-.ColumnHeads = True
-.AddItem
-'.List(.ListCount - 1, 0) = i
-.List(.ListCount - 1, 0) = a(i, 1)
-.List(.ListCount - 1, 1) = a(i, 2)
-.List(.ListCount - 1, 2) = a(i, 3)
-.List(.ListCount - 1, 3) = a(i, 4)
-
-End If
+For $i = 1 To 100;Loop
+    $sCellValue = _ExcelReadCell($oExcel, $i, 1)
+	$CNPJ[$n] = $sCellValue
+	$cCellValue = _ExcelReadCell($oExcel, $i, 2)
+	$FAT[$n] = $cCellValue
+	$eCellValue = _ExcelReadCell($oExcel, $i, 3)
+	$PARCELA[$n] = $eCellValue
+	$dCellValue = _ExcelReadCell($oExcel, $i, 4)
+	$DEFESA[$n] = $dCellValue
+	$n = $n + 1
 Next
+	$n = 0
+	Sleep(200)	
 
+;Proposta de crédito Empresas
+For $n = 0 To 100
+while Hex(PixelGetColor(585,385),6) <> "1A3AB0"
+MouseClick("LEFT", 99, 12)
+Sleep(200)
+MouseClick("LEFT", 224, 56)
+Sleep(100)
+While Hex(PixelGetColor(355,14),6) <> "9FCFFF"
+	Sleep(1000)
+	WEnd
+;Proposta
+MouseClick("LEFT", 197, 32)
+Sleep(200)
+MouseClick("LEFT", 222, 73)
+While Hex(PixelGetColor(344,339),6) <> "FFFF63"
+	Sleep(1000)
+Wend
+Sleep(500)
 
-    '.ColumnCount = 7
-    
-
-
-End With
-
-
-
-
-
-
-End Sub
-
-
-
-
-
-Private Sub UserForm_Initialize()
-   ComboBox1.AddItem "APROVADA"
-    ComboBox1.AddItem "NEGADA"
-    ComboBox1.AddItem "FORM INCOMPLETO"
-    ComboBox1.AddItem "NAO CORRENTISTA"
-
-
-End Sub
-
-
-
-Private Sub CommandButton1_Click()
-Dim sh As Worksheet
-Set sh = ThisWorkbook.Sheets("Email")
-
-
-
-Dim last_row As Integer
-last_row = Application.CountA(sh.Range("A:A"))
-
-Dim OutlookApp As Object
-    Dim OutlookMail As Object
-    Set OutlookApp = CreateObject("Outlook.Application")
-    Set OutlookMail = OutlookApp.CreateItem(0)
-    
-    
-If ComboBox1.ListIndex = 0 Then
-
-    
-    
-
-    With OutlookMail
-        .to = sendTo
-        .CC = ""
-        .BCC = ""
-        .Subject = "Retorno sobre solicitação de crédito"
-        .Body = "Olá, você foi recusado pelo motivo de:" & sh.Range("E" & i).Value
-        .Display '
-    End With
-    
- 
-    Set OutlookMail = Nothing
-    Set OutlookApp = Nothing
+;Colocar CNPJ
+MouseClick("LEFT", 219, 338)
+Send("2")
+Sleep(400)
+Send("{TAB}")
+Send($CNPJ[$n])
+Send("{TAB}")
+Sleep(1200)
+MouseClick("LEFT", 677, 338)
+Sleep(3300)
 
 
 
+While Hex(PixelGetColor(363,335),6) == "800000"
+	MouseClick("LEFT", 409, 340)
+	sleep(300)
+	MouseClick("LEFT", 404, 169)
+	sleep(700)
+	Send($CNPJ[$n])
+	MouseClick("LEFT", 540, 169)
+	sleep(30)
+	
+	Send("{TAB}")
+	MouseClick("LEFT", 691, 324)
+	sleep(100)
+	MouseClick("LEFT", 677, 338	)
+	sleep(100)
+	MouseClick("LEFT", 601, 551)
+	sleep(100)
+	MouseClick("LEFT", 697, 339)
+	sleep(300)
+	MouseClick("LEFT", 600, 383)
+wend
 
 
+$i = 0
+While Hex(PixelGetColor(585,385),6) <> "1A3AB0" and  $i < 6
+	Sleep(4000)
+	MouseClick("LEFT", 677, 338)
+	$i = $i + 1
+Wend
+;edit 1201
 
 
 
 
 
+Wend
+Sleep(200)
+MouseClick("LEFT", 585, 385)
+Sleep(400)
+;Contratar (vermelho no x)
+While Hex(PixelGetColor(684,547),6) == "FF0000"
+	Sleep(100)
+Wend
+Sleep(300)
+MouseClick("LEFT", 466, 521)
+Sleep(400)
+While Hex(PixelGetColor(44,326),6) <> "FFFF63"
+	Sleep(2000)
+	MouseClick("LEFT", 466, 521)
+Wend
+MouseClick("LEFT", 44, 326)
+; PROPOSTA DE CRÉDITO
+Send("66")
+Sleep(2500)
+;conferencia 66
+$r = 0
+While Hex(PixelGetColor(410,326),6) <> "FFFF63"
+While $r < 2
+	Send("{TAB}")
+	Sleep(1000)
+	MouseClick("LEFT", 65, 330)
+	while Hex(PixelGetColor(496,483),6) <> "FF0000"
+	MouseClick("LEFT", 502, 483)
+	Sleep(50)
+	wend
+	$r = $r + 1
+Wend
+while Hex(PixelGetColor(182,327),6) <> "000000"
+	MouseClick("LEFT", 65, 330)
+	while Hex(PixelGetColor(483,236),6) <> "000080"
+		sleep(100)
+	WEnd
+	MouseClick("LEFT", 549, 345)
+	sleep(15)
+	MouseClick("LEFT", 450, 335)
+sleep(15)
+	MouseClick("LEFT", 404, 486)
+	sleep(50)
+	While Hex(PixelGetColor(432,371),6) <> "FFFF63"
+		MouseClick("LEFT", 404, 486)
+	wend
+WEnd
+WEnd
+MouseClick("LEFT", 410,326)
+Send("1359")
+Sleep(3000)
+Send("{TAB}")
+Send($FAT[$n])
+Sleep(400)
+Send("{TAB}")
+Send("{TAB}")
+Send("{TAB}")
+Send("12")
+Sleep(400)
+Send("{TAB}")
+Send("MESES")
+Sleep(400)
+Send("{ENTER}")
+Sleep(1000)
+;conferencia 1359
+while Hex(PixelGetColor(535,328),6) <> "000000"
+	MouseClick("LEFT", 438, 326)
+	while Hex(PixelGetColor(403,488),6) <> "1A3AB0"
+		SLEEP(100)
+	WEND
+	MouseClick("LEFT", 262,285)
+	MouseClick("LEFT", 403,488)
+	While Hex(PixelGetColor(504,263),6) <> "FFFFFF"
+		SLEEP(100)
+	WEnd
+	IF Hex(PixelGetColor(112,369),6) == "FFFF63" then
+	MouseClick("LEFT", 145,366)	
+	Send($FAT[$n])
+	Sleep(400)
+	Send("{TAB}")
+	Send("{TAB}")
+	Send("{TAB}")
+	Send("12")
+	Sleep(400)
+	Send("{TAB}")
+	Send("MESES")
+	Sleep(400)
+	Send("{ENTER}")
+	Sleep(1500)
+	EndIf
+WEND
+Sleep(1000)
+;msgbox(0,"1")
+;Incluir estando azul
+While Hex(PixelGetColor(140,384),6) <> "C0C0C0"
+	IF Hex(PixelGetColor(490,507),6) == "FF0000" THEN 
+		MouseClick("LEFT", 490,507)
+		MouseClick("LEFT", 480,477)
+	Else
+		MouseClick("LEFT", 480,477)
+		ENDIF
+	Sleep(1000)
+Wend
+MouseClick("LEFT", 657, 372)
+;Incluir estando cinza
+While Hex(PixelGetColor(657,372),6) <> "8A8A8A"
+	Sleep(1000)
+Wend
+MouseClick("LEFT", 496, 482)
+;só checar o ok azul
+While Hex(PixelGetColor(583,551),6) <> "1A3AB0"
+	Sleep(1000)
+	MouseClick("LEFT", 496, 482)
+Wend
+;clicar no incluir
+MouseClick("LEFT", 688, 254)
+;Incluir Proposta
+While Hex(PixelGetColor(146,283),6) <> "FFFF63"
+	Sleep(1000)
+Wend
+MouseClick("LEFT", 146, 283)
+Send("DS")
+Sleep(800)
+MouseClick("LEFT", 450, 283)
+Sleep(200)
+Send("100")
+Sleep(800)
+MouseClick("LEFT", 483, 477)
 
-ElseIf ComboBox1.ListIndex = 1 Then
-
-Set sh = Sheets("Email")
-
-Set OutApp = CreateObject("Outlook.Application")
-
-For Each cell In sh.Columns("G").Cells.SpecialCells(xlCellTypeConstants)
-
-    'Enter the path/file names in the D:Z column in each row
-    Set rng = sh.Cells(cell.Row, 1).Range("D1:Z1")
-    
-    If cell.Value Like "?*@?*.?*" And _
-    Application.WorksheetFunction.CountA(rng) > 0 Then
-        Set OutMail = OutApp.CreateItem(0)
-        
-        With OutMail
-            .to = sh.Cells(cell.Row, 7).Value
-            .CC = ""
-            .Subject = "Example Subject 1"
-            .Body = "oi"
-            
-         '   For Each FileCell In rng.SpecialCells(xlCellTypeConstants)
-           '     If Trim(FileCell.Value) <> "" Then
-              '      If Dir(FileCell.Value) <> "" Then
-               '         .Attachments.Add FileCell.Value
-                '    End If
-              '  End If
-           ' Next FileCell
-            
-            .Display
-            'Or use .Display/Send
-        End With
-        
-        Set OutMail = Nothing
-    End If
-Next cell
-
-Set OutApp = Nothing
-
-With Application
-    .EnableEvents = True
-    .ScreenUpdating = True
-End With
-
-ElseIf ComboBox1.ListIndex = 2 Then
-MsgBox "oi3"
+;hile Hex(PixelGetColor(301,285),6) <> "000000"
+	;MouseClick("LEFT", 168,280)
+	;hile Hex(PixelGetColor(404,202),6) <> "000080"
+		;MouseClick("LEFT", 439,228)
+		;MouseClick("LEFT", 395,510)
+		;sleep(400)
+	;end
+;hile Hex(PixelGetColor(478,479),6) == "1A3AB0"
+	;MouseClick("LEFT", 478,479)
+	;sleep(200)
+	;if Hex(PixelGetColor(478,479),6) == "1A3AB0" then
+	;MouseClick("LEFT", 432, 282)
+	;Send("100")
+	;Sleep(200)
+	;Send("{ENTER}")
+	;MouseClick("LEFT", 478,479)
+	;endif
+;end
 
 
+MouseClick("LEFT", 478, 479)
+;fundo branco****
+While Hex(PixelGetColor(536,277),6) <> "FFFFFF"
+	Sleep(1000)
+Wend
+MouseClick("LEFT", 598, 548)
+;botão aceitar cinza
+While Hex(PixelGetColor(684,505),6) <> "FF0000"
+	Sleep(1000)
+Wend
+;garantias
+MouseClick("LEFT", 411, 479)
+While Hex(PixelGetColor(680,521),6) <> "1A3AB0"
+	Sleep(1000)
+Wend
+MouseClick("LEFT", 680, 521)
+;botão aceitar vermelha
+While Hex(PixelGetColor(681,508),6) <> "FF0000"
+	Sleep(1000)
+Wend
+;dados espec
+MouseClick("LEFT", 283, 481)
+While Hex(PixelGetColor(576,540),6) <> "1A3AB0"
+	Sleep(1000)
+	MouseClick("LEFT", 283, 481)
+Wend
+MouseClick("LEFT", 576, 540)
 
-ElseIf ComboBox1.ListIndex = 3 Then
-MsgBox "oi4"
+;botão aceitar vermelha
+While Hex(PixelGetColor(681,508),6) <> "FF0000"
+	Sleep(1000)
+Wend
+
+;análise auto
+MouseClick("LEFT", 688, 440)
+While Hex(PixelGetColor(578,547),6) <> "1A3AB0"
+	Sleep(1000)
+Wend
+MouseClick("LEFT", 578, 547)
+
+;defesa de crédito
+Sleep(500)
+MouseClick("LEFT", 576, 481)
+While Hex(PixelGetColor(395,325),6) <> "FFFF63"
+	Sleep(1000)
+	MouseClick("LEFT", 576, 481)
+Wend
+MouseClick("LEFT", 71, 436)
+Send($DEFESA[$n])
+MouseClick("LEFT", 397, 325)
+send("V")
+Send("{ENTER}")
+MouseClick("LEFT", 435, 368)
+While Hex(PixelGetColor(508,189),6) <> "000080"
+	Sleep(1000)
+Wend
+MouseClick("LEFT", 326, 222)
+MouseClick("LEFT", 400, 515)
+;fundo branco
+While Hex(PixelGetColor(390,518),6) == "1A3AB0"
+	Sleep(1000)
+Wend
+MouseClick("LEFT", 585,518)
+	Sleep(1000)
+;botão vermelho
+Send("{ESC}")
+	Sleep(1000)
+	MouseClick("LEFT", 683,507)
+	Sleep(1000)
+	MouseClick("LEFT", 684,547)
+While Hex(PixelGetColor(684,547),6) <> "FF0000"
+	Sleep(5000)
+Wend
+Sleep(3000)
+MouseClick("LEFT", 684,547)
+
+;botão vermelho 2
+
+While Hex(PixelGetColor(684,379),6) <> "FF0000"
+	Sleep(1000)
+Wend
+While Hex(PixelGetColor(684,379),6) == "FF0000"
+	MouseClick("LEFT", 684,379)
+	Send("{ESC}")
+	Sleep(1000)
+	Send("{ESC}")
+Wend
 
 
 
-Else
-MsgBox "Nenhum item selecionado"
-End If
+;Empurrar para o CD
+MouseClick("LEFT", 99, 12)
+sleep(120)
+MouseClick("LEFT", 198, 162)
+sleep(120)
+MouseClick("LEFT", 75, 32)
+sleep(120)
+MouseClick("LEFT", 101, 53)
+while Hex(PixelGetColor(333,175),6) <> "FFFF63"
+Sleep(200)
+WEnd ;parte 2
+MouseClick("LEFT", 270, 172)
+SEND("2")
+Sleep(400)
+Send("{TAB}")
+Sleep(100)
+Send($CNPJ[$n])
+Send("{TAB}")
+Sleep(300)
 
-End Sub
+while Hex(PixelGetColor(243,174),6) <> "000000" ;enquanto o campo cnpj estiver limpo
+MouseClick("LEFT", 303, 173)
+Sleep(10)
+SEND("2")
+Sleep(1200)
+Send("{TAB}")
+Send("{TAB}")
+Sleep(50)
+WEnd
+	
+	
+	
+MouseClick("LEFT", 663, 238)
+Sleep(300)
+while Hex(PixelGetColor(681,519),6) <> "000000"
+MouseClick("LEFT", 663, 238)
+Sleep(300)
+WEnd
+MouseClick("LEFT", 672, 521)
+while Hex(PixelGetColor(680,518),6) <> "FF0000"
+Sleep(300)
+MouseClick("LEFT", 672, 521)
+WEND
+MouseClick("LEFT", 683, 491)
+Sleep(100)
+while Hex(PixelGetColor(87,412),6) <> "FFFF63"
+MouseClick("LEFT", 683, 491)
+Sleep(200)
+WEnd
+MouseClick("LEFT", 87, 412)
+SEND("De Acordo")
+MouseClick("LEFT", 729, 283)
+Sleep(200)
+while Hex(PixelGetColor(406,183),6) <> "000080"
+	MouseClick("LEFT", 729, 283)
+	Sleep(200)
+WEnd
+MouseClick("LEFT", 410, 305)
+Sleep(200)
+MouseClick("LEFT", 406, 465)
+Sleep(100)
+while Hex(PixelGetColor(174,327),6) <> "FFFF63"
+Sleep(200)
+WEnd
+MouseClick("LEFT", 198,326)
+while Hex(PixelGetColor(414,441),6) <> "1A3AB0"
+MouseClick("LEFT", 198, 326)
+Sleep(100)
+WEnd
+MouseClick("LEFT", 414,441)
+while Hex(PixelGetColor(569,553),6) <> "1A3AB0"
+MouseClick("LEFT", 414, 441)
+Sleep(100)
+WEnd
+MouseClick("LEFT", 569,553)
+Sleep(400)
+Send("{ENTER}")
+Sleep(1000)
+while Hex(PixelGetColor(690,545),6) <> "FF0000"
+Sleep(1000)
+WEnd
+MouseClick("LEFT", 690,545)
+while Hex(PixelGetColor(649,428),6) <> "E6E6E6"
+MouseClick("LEFT", 690,545)
+Sleep(1000)
+WEnd
+
+next
+
+FUNC PAUSE()
+	$HotKey = NOT $Hotkey
+	
+	While $HotKey
+			sleep(500)
+			ToolTip('Robô está "Pausado". ||| Para finalizar o Robô : F4' ,0,0)
+		WEnd
+		ToolTip("")
+	EndFunc
+	
+Func Kill()
+	msgBox(0,"Fim","O robô foi encerrado com sucesso.",1)
+	
+	
+	Exit 0
+EndFunc
+
 
