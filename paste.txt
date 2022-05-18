@@ -1,0 +1,132 @@
+Option Explicit
+
+
+
+Function GetBoiler(ByVal sFile As String) As String
+    Dim fso As Object, ts As Object
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    Set ts = fso.GetFile(sFile).OpenAsTextStream(1, -2)
+    GetBoiler = ts.ReadAll
+    ts.Close
+End Function
+
+
+Sub Emailtest()
+   Dim SigString As String
+    Dim SigName As String
+    Dim Signature As String
+    Dim OutApp As Object
+    Dim OutMail As Object
+    Dim EmailTo As String
+    Dim Ratesheetpdf As Variant
+    Dim subj As String
+    Dim body As String
+    Dim LastRw As Long
+    Dim i As Integer
+    Dim wb As Workbook
+   Dim OutlookApp As Object
+    Dim OutlookMail As Object
+    Set OutlookApp = CreateObject("Outlook.Application")
+    Set OutlookMail = OutlookApp.CreateItem(0)
+    
+    
+       Set wb = ThisWorkbook
+       
+           MsgBox ("Select Powerpoint Email body File")
+    Dim strFileName As String
+    strFileName = Application.GetOpenFilename( _
+        FileFilter:="PowerPoint Files (*.pptx), *.pptx", _
+        Title:="Open", _
+        ButtonText:="Open")
+        
+        
+     
+    If strFileName = "False" Then Exit Sub
+    
+    Dim pptApp As Object
+    Dim pptPres As Object
+    Dim pptSlide As Object
+    
+    Set pptApp = CreateObject("PowerPoint.Application")
+    Set pptPres = pptApp.Presentations.Open(strFileName)
+    Set pptSlide = pptPres.Slides(1)
+  
+
+    
+    
+    wb.Activate
+    SigName = Sheets(1).Range("c2")
+    SigString = Environ("appdata") & _
+                "\Microsoft\Signatures\" & SigName & ".htm"
+    If Dir(SigString) <> "" Then
+        Signature = GetBoiler(SigString)
+    Else
+        Signature = ""
+    End If
+    
+    
+    With OutlookMail
+    Set .SendUsingAccount = OutlookApp.Session.Accounts.item(1)
+    .Display
+        
+    
+        .To = ""
+        .CC = ""
+        .BCC = ""
+        .Subject = "Report Diário - Contas Elegíveis ao Digital abertas no Modelo Físico"
+        .body = ""
+        pptSlide.Copy
+        
+        With .GetInspector.WordEditor
+            .Application.Selection.EndKey Unit:=6 'wdStory
+            .Application.Selection.TypeParagraph
+            .Application.Selection.PasteSpecial (ppPasteMetafilePicture)
+        End With
+
+            .HTMLBody = .HTMLBody & vbNewLine & vbNewLine & Signature
+       
+     
+        .Display
+        
+      
+     
+        
+    End With
+   
+    Set OutlookMail = Nothing
+    Set OutlookApp = Nothing
+    
+    
+    
+    
+    
+    
+    
+    
+    
+  
+    
+
+
+    
+   
+   
+
+    
+    Set pptApp = Nothing
+    Set pptPres = Nothing
+    Set pptSlide = Nothing
+    Set OutMail = Nothing
+    Set OutApp = Nothing
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+End Sub
+
